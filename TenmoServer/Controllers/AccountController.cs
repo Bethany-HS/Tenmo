@@ -14,23 +14,24 @@ namespace TenmoServer.Controllers
     public class AccountController : ControllerBase
     {
         private AccountDAO accountDAO;
-        private UserSqlDAO userDAO;
+        private IUserDAO userDAO;
 
-        public AccountController(AccountDAO _accountDAO, UserSqlDAO _userDAO)
+        public AccountController(AccountDAO _accountDAO, IUserDAO _userDAO)
         {
             accountDAO = _accountDAO;
             userDAO = _userDAO;
         }
 
-       [HttpGet("balance")]
-       public ActionResult<Decimal> GetBalance(ReturnUser user)
+       [HttpGet("{id}/balance")]
+       public ActionResult<Decimal> GetBalance(int id)
         {
-            if (!string.IsNullOrEmpty(userDAO.GetUser(user.Username).Username))
-            {
-                return Ok(accountDAO.GetBalance(user.UserId));
-            }
-            return NotFound();
+                return Ok(accountDAO.GetBalance(id));
         }
 
+        [HttpGet("/test")]
+        public ActionResult Test()
+        {
+            return Ok();
+        }
     }
 }
