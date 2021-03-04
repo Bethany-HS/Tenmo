@@ -12,8 +12,7 @@ namespace TenmoClient
 
         public decimal GetBalance(int userID)
         {
-            RestRequest request = new RestRequest(API_BASE_URL + "api/account/balance");
-            request.AddJsonBody(userID);
+            RestRequest request = new RestRequest(API_BASE_URL + $"api/account/{userID}/balance");
             IRestResponse<decimal> balance = client.Get<decimal>(request);
             if (ProcessResponse(balance))
             {

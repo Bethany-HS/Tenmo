@@ -8,14 +8,14 @@ namespace TenmoServer.DAO
 {
     public class AccountDAO
     {
-        private readonly string ConnectionString;
+        private string ConnectionString;
 
         public AccountDAO(string connectionString)
         {
             ConnectionString = connectionString;
         }
 
-        public decimal GetBalance(int userID)
+        public decimal GetBalance(int id)
         {
             decimal output = -1;
             try
@@ -24,7 +24,7 @@ namespace TenmoServer.DAO
                 {
                     conn.Open();
                     SqlCommand command = new SqlCommand("select balance from accounts where user_id = @userID", conn);
-                    command.Parameters.AddWithValue("@userID", userID);
+                    command.Parameters.AddWithValue("@userID", id);
                     SqlDataReader reader = command.ExecuteReader();
 
                     while (reader.Read())
