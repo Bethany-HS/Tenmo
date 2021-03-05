@@ -25,7 +25,7 @@ namespace TenmoClient
 
         public List<OtherUser> RetrieveUsers()
         {
-            RestRequest request = new RestRequest(API_BASE_URL + );
+            RestRequest request = new RestRequest(API_BASE_URL + "users");
             IRestResponse<List<OtherUser>> users = client.Get<List<OtherUser>>(request);
 
             return users.Data;

@@ -31,7 +31,7 @@ namespace TenmoServer.Controllers
         }
 
         [HttpGet("/users")]
-        public ActionResult<List<User>> Test()
+        public ActionResult<List<User>> GetOtherUsers()
         {
             return Ok(userDAO.GetUsers());
         }
