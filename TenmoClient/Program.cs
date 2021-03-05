@@ -119,13 +119,17 @@ namespace TenmoClient
                         Console.WriteLine("---------");
                         Console.Write("Enter ID of user you are sending to (0 to cancel) ");
                         string userToSendInput = Console.ReadLine();
+                        if(userToSendInput.Trim() == "0")
+                        {
+                            return;
+                        }
                         Console.Write("Enter Amount: ");
                         string amountToSendInput = Console.ReadLine();
                         try
                         {
                             int sendUserId = Convert.ToInt32(userToSendInput);
                             int sendAmount = Convert.ToInt32(amountToSendInput);
-                             
+                            Transfer transfer = new Transfer(2,2, UserService.GetUserId(), sendUserId, sendAmount);
                         }
                         catch (Exception)
                         {
