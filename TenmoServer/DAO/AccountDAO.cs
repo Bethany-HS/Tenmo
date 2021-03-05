@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using TenmoServer.Models;
 
 namespace TenmoServer.DAO
 {
@@ -39,5 +40,47 @@ namespace TenmoServer.DAO
             }
             return output;
         }
+        //TRANSFERS TABLE account_from -- Foreign key to the accounts table; 
+        //identifies the account that the funds are being taken from
+        // TRANSFERS TABLE account_to -- Foreign key to the accounts table
+        //identifies the account that the funds are going to
+        public bool UpdateBalance(decimal updatedBalance, int accountId)
+        {
+            try
+            {
+                using(SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    decimal originalBalance = -1;
+                    SqlCommand cmd = new SqlCommand("select balance from accounts " +
+                        "where account_id = @accountId", conn);
+                    cmd.Parameters.AddWithValue("@accountId", accountId);
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while(reader.Read())
+                    {
+                        originalBalance = Convert.ToDecimal(reader["balance"]);
+                    }
+                    conn.Close();
+                    if ((originalBalance + updatedBalance) < 0)
+                    {
+                        return false;
+                    }
+
+                    conn.Open();
+                    SqlCommand cmd2 = new SqlCommand("update accounts set balance = @balance " +
+                        "where account_id = @accountId", conn);
+                    cmd2.Parameters.AddWithValue("@balance", updatedBalance + originalBalance);
+                    cmd2.Parameters.AddWithValue("@accountId", accountId);
+                    cmd2.ExecuteNonQuery();
+                }
+             }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return true;
+        }
+
     }
 }

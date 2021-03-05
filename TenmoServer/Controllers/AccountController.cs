@@ -15,23 +15,37 @@ namespace TenmoServer.Controllers
     {
         private AccountDAO accountDAO;
         private IUserDAO userDAO;
+        private TransferSqlDAO transferDAO;
 
-        public AccountController(AccountDAO _accountDAO, IUserDAO _userDAO)
+        public AccountController(AccountDAO _accountDAO, IUserDAO _userDAO, TransferSqlDAO _transferDAO)
         {
             accountDAO = _accountDAO;
             userDAO = _userDAO;
+            transferDAO = _transferDAO;
         }
 
-       [HttpGet("{id}/balance")]
-       public ActionResult<Decimal> GetBalance(int id)
+        [HttpGet("{id}/balance")]
+        public ActionResult<Decimal> GetBalance(int id)
         {
-                return Ok(accountDAO.GetBalance(id));
+            return Ok(accountDAO.GetBalance(id));
         }
 
-        [HttpGet("/test")]
-        public ActionResult Test()
+        [HttpGet("/users")]
+        public ActionResult<List<User>> Test()
         {
-            return Ok();
+            return Ok(userDAO.GetUsers());
+        }
+        [HttpGet("{id}/transfers")]
+        public ActionResult<List<ReturnTransfer>> GetAllTransfers(int id)
+        {
+            List<ReturnTransfer> transfers = transferDAO.GetTransfers(id);
+            return transfers;
+        }
+        [HttpPost("transfers")]
+        public ActionResult<Transfer> SendMoney(Transfer incomingTransfer)
+        {
+            Transfer result = transferDAO.SendMoney(incomingTransfer);
+            return Created($"/transfers/{result.Transfer_id}", result);
         }
     }
 }
