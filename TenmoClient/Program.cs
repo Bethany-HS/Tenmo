@@ -88,8 +88,8 @@ namespace TenmoClient
                 else if (menuSelection == 1)
                 {
                     decimal balance = accountService.GetBalance(UserService.GetUserId());
+                    Console.Clear();
                     Console.WriteLine($"Your account balance is: {balance:C2}");
-                    Console.ReadLine();
 
                 }
                 else if (menuSelection == 2)
@@ -143,35 +143,36 @@ namespace TenmoClient
             
             foreach(ReturnTransfer transfer in transfers)
             {
-                Console.Write($"{transfer.Transfer_id}");
+                Console.Write($"{transfer.Transfer_id}".PadRight(10));
                 if(transfer.FromName == UserService.GetUserName())
                 {
-                    Console.Write("To: ".PadLeft(15));
-                    Console.Write($"{transfer.ToName}".PadLeft(5));
-                    Console.WriteLine($"{transfer.Amount:C2}".PadLeft(17));
+                    Console.Write("To: ".PadRight(6));
+                    Console.Write($"{transfer.ToName}");
+                    Console.WriteLine($"{transfer.Amount:C2}".PadLeft(15));
                 }
                 else
                 {
-                    Console.Write("From: ".PadLeft(15));
+                    Console.Write("From: ");
                     Console.Write($"{transfer.FromName}");
-                    Console.WriteLine($"{transfer.Amount:C2}".PadLeft(17));
+                    Console.WriteLine($"{transfer.Amount:C2}".PadLeft(15));
                 }
 
             }
             Console.WriteLine("---------");
-            Console.Write("Please enter the transfer ID to view details (0 to cancel): ");
-            string userInput = Console.ReadLine().Trim();
             bool validTransfer = false;
-            if(userInput == "0")
-            {
-                return;
-            }
             do
             {
+                Console.Write("Please enter the transfer ID to view details (0 to cancel): ");
+                string userInput = Console.ReadLine().Trim();
+
+                if (userInput == "0")
+                {
+                    return;
+                }
                 try
                 {
                     ReturnTransfer returnTransfer = transferService.GetTransfer(Convert.ToInt32(userInput));
-                    if (returnTransfer != null)
+                    if (returnTransfer.Transfer_id != 0)
                     {
                         Console.WriteLine("-------------------------------------------");
                         Console.WriteLine("Transfer Details");
@@ -179,9 +180,14 @@ namespace TenmoClient
                         Console.WriteLine($"Id: {returnTransfer.Transfer_id}");
                         Console.WriteLine($"From: {returnTransfer.FromName}");
                         Console.WriteLine($"To: {returnTransfer.ToName}");
-                        Console.WriteLine($"Type: {returnTransfer.Transfer_type_id}");
-                        Console.WriteLine($"Status: {returnTransfer.Transfer_status_id}");
+                        Console.WriteLine($"Type: {returnTransfer.TransferType}");
+                        Console.WriteLine($"Status: {returnTransfer.TransferStatus}");
                         Console.WriteLine($"Amount: {returnTransfer.Amount:C2}");
+                        Console.WriteLine("-------------------------------------------");
+                        Console.WriteLine("Please press any button to return");
+                        Console.ReadLine();
+                        Console.Clear();
+                        validTransfer = true;
                     }
                     else
                     {

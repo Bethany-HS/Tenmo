@@ -1,4 +1,5 @@
 ﻿using RestSharp;
+using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,7 @@ namespace TenmoClient
         public decimal GetBalance(int userID)
         {
             RestRequest request = new RestRequest(API_BASE_URL + $"api/account/{userID}/balance");
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
             IRestResponse<decimal> balance = client.Get<decimal>(request);
             if (ProcessResponse(balance))
             {
@@ -26,6 +28,7 @@ namespace TenmoClient
         public List<OtherUser> RetrieveUsers()
         {
             RestRequest request = new RestRequest(API_BASE_URL + "users");
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
             IRestResponse<List<OtherUser>> users = client.Get<List<OtherUser>>(request);
 
             return users.Data;

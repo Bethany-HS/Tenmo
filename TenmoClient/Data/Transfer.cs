@@ -37,6 +37,8 @@ namespace TenmoClient.Data
     {
         public string ToName { get; set; }
         public string FromName { get; set; }
+        public string TransferType { get; set; }
+        public string TransferStatus { get; set; }
 
         public ReturnTransfer()
         {

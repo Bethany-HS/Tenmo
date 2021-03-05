@@ -1,4 +1,5 @@
 ﻿using RestSharp;
+using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,7 @@ namespace TenmoClient
         public List<ReturnTransfer> GetTransfers(int userID)
         {
             RestRequest request = new RestRequest(API_BASE_URL + $"api/account/{userID}/transfers");
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
             IRestResponse<List<ReturnTransfer>> response = client.Get<List<ReturnTransfer>>(request);
             if (ProcessResponse(response))
             {
@@ -24,8 +26,9 @@ namespace TenmoClient
 
         public bool SendMoney(Transfer transfer)
         {
-            RestRequest request = new RestRequest(API_BASE_URL + "api/account/transfers");
+            RestRequest request = new RestRequest(API_BASE_URL + "api/transfer");
             request.AddJsonBody(transfer);
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
             IRestResponse response = client.Post(request);
             if (ProcessResponse(response))
             {
@@ -36,7 +39,7 @@ namespace TenmoClient
 
         public ReturnTransfer GetTransfer(int transferId)
         {
-            RestRequest request = new RestRequest(API_BASE_URL);
+            RestRequest request = new RestRequest(API_BASE_URL + $"api/transfer/{transferId}");
             IRestResponse<ReturnTransfer> response = client.Get<ReturnTransfer>(request);
             if (ProcessResponse(response))
             {
