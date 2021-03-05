@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TenmoClient.Data;
 
 namespace TenmoClient
 {
@@ -20,6 +21,14 @@ namespace TenmoClient
             }
             return -1;
 
+        }
+
+        public List<OtherUser> RetrieveUsers()
+        {
+            RestRequest request = new RestRequest(API_BASE_URL + );
+            IRestResponse<List<OtherUser>> users = client.Get<List<OtherUser>>(request);
+
+            return users.Data;
         }
     }
 }

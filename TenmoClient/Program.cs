@@ -93,6 +93,7 @@ namespace TenmoClient
                 else if (menuSelection == 2)
                 {
 
+
                 }
                 else if (menuSelection == 3)
                 {
@@ -100,6 +101,39 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 4)
                 {
+                    bool sendMenu = true;
+                    do
+                    {
+                        List<OtherUser> otherUsers = accountService.RetrieveUsers();
+                        Console.Clear();
+                        Console.WriteLine("-------------------------------------------");
+                        Console.WriteLine("Users");
+                        Console.Write("ID");
+                        Console.WriteLine("Name".PadLeft(10));
+                        Console.WriteLine("-------------------------------------------");
+                        foreach (OtherUser user in otherUsers)
+                        {
+                            Console.Write($"{user.User_Id}");
+                            Console.WriteLine($"{user.Username}".PadLeft(10));
+                        }
+                        Console.WriteLine("---------");
+                        Console.Write("Enter ID of user you are sending to (0 to cancel) ");
+                        string userToSendInput = Console.ReadLine();
+                        Console.Write("Enter Amount: ");
+                        string amountToSendInput = Console.ReadLine();
+                        try
+                        {
+                            int sendUserId = Convert.ToInt32(userToSendInput);
+                            int sendAmount = Convert.ToInt32(amountToSendInput);
+                             
+                        }
+                        catch (Exception)
+                        {
+
+                            throw;
+                        }
+                  
+                    } while (sendMenu);
 
                 }
                 else if (menuSelection == 5)

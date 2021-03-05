@@ -28,10 +28,5 @@ namespace TenmoServer.Controllers
                 return Ok(accountDAO.GetBalance(id));
         }
 
-        [HttpGet("/test")]
-        public ActionResult Test()
-        {
-            return Ok();
-        }
     }
 }
