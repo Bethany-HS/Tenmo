@@ -8,7 +8,7 @@ using TenmoServer.Models;
 
 namespace TenmoServer.DAO
 {
-    public class TransferSqlDAO
+    public class TransferSqlDAO : ITransferDAO
     {
         private readonly string ConnectionString;
         public TransferSqlDAO(string connectionString)
@@ -190,6 +190,27 @@ namespace TenmoServer.DAO
             }
         }
 
+        public bool UpdateTransferStatus(Transfer transfer)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand("update transfers set transfer_status_id = @transferType " +
+                        "where transfer_id = @transferId", conn);
+                    cmd.Parameters.AddWithValue("@transferType", transfer.Transfer_status_id);
+                    cmd.Parameters.AddWithValue("@transferId", transfer.Transfer_id);
+                    cmd.ExecuteNonQuery();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
 
     }
 }

@@ -16,11 +16,11 @@ namespace TenmoServer.Controllers
 
     public class AccountController : ControllerBase
     {
-        private AccountDAO accountDAO;
+        private AccountSqlDAO accountDAO;
         private IUserDAO userDAO;
         private TransferSqlDAO transferDAO;
 
-        public AccountController(AccountDAO _accountDAO, IUserDAO _userDAO, TransferSqlDAO _transferDAO)
+        public AccountController(AccountSqlDAO _accountDAO, IUserDAO _userDAO, TransferSqlDAO _transferDAO)
         {
             accountDAO = _accountDAO;
             userDAO = _userDAO;

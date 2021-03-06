@@ -40,12 +40,25 @@ namespace TenmoClient
         public ReturnTransfer GetTransfer(int transferId)
         {
             RestRequest request = new RestRequest(API_BASE_URL + $"api/transfer/{transferId}");
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
             IRestResponse<ReturnTransfer> response = client.Get<ReturnTransfer>(request);
             if (ProcessResponse(response))
             {
                 return response.Data;
             }
             return null;
+        }
+
+        public bool UpdateTransferStatus(Transfer transfer)
+        {
+            RestRequest request = new RestRequest(API_BASE_URL + $"api/transfer/");
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+            request.AddJsonBody(transfer);
+            IRestResponse response = client.Put(request);
+            if (ProcessResponse(response)){
+                return true;
+            }
+            else return false;
         }
     }
 }
