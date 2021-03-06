@@ -16,9 +16,9 @@ namespace TenmoServer.Controllers
     public class TransferController : ControllerBase
     {
         private TransferSqlDAO TransferDAO;
-        private AccountDAO AccountDAO;
+        private AccountSqlDAO AccountDAO;
 
-        public TransferController(TransferSqlDAO _transferDAO, AccountDAO _accountDAO)
+        public TransferController(TransferSqlDAO _transferDAO, AccountSqlDAO _accountDAO)
         {
             TransferDAO = _transferDAO;
             AccountDAO = _accountDAO;
@@ -27,14 +27,22 @@ namespace TenmoServer.Controllers
         [HttpPost]
         public ActionResult<Transfer> SendMoney(Transfer incomingTransfer)
         {
-            if(AccountDAO.UpdateBalance(0 - incomingTransfer.Amount, incomingTransfer.Account_from))
+            if(incomingTransfer.Transfer_status_id == 2)
             {
-                if(AccountDAO.UpdateBalance(incomingTransfer.Amount, incomingTransfer.Account_to))
+                if (AccountDAO.UpdateBalance(0 - incomingTransfer.Amount, incomingTransfer.Account_from))
                 {
-                    Transfer result = TransferDAO.CreateTransfer(incomingTransfer);
-                    return Created($"/transfers/{result.Transfer_id}", result);
+                    if (AccountDAO.UpdateBalance(incomingTransfer.Amount, incomingTransfer.Account_to))
+                    {
+                        Transfer result = TransferDAO.CreateTransfer(incomingTransfer);
+                        return Created($"/transfers/{result.Transfer_id}", result);
+                    }
                 }
             }
+            else
+            {
+                Transfer result = TransferDAO.CreateTransfer(incomingTransfer);
+            }
+
             return null;
         }
 
@@ -48,6 +56,21 @@ namespace TenmoServer.Controllers
             result.TransferType = TransferDAO.GetTransferType(result.Transfer_type_id);
             return result;
 
+        }
+
+        [HttpPut]
+        public ActionResult UpdateTransferStatus(Transfer transfer)
+        {
+            if (TransferDAO.UpdateTransferStatus(transfer))
+            {
+                if(transfer.Transfer_status_id == 2)
+                {
+                    AccountDAO.UpdateBalance(0 - transfer.Amount, transfer.Account_from);
+                    AccountDAO.UpdateBalance(transfer.Amount, transfer.Account_to);
+                }
+                return Ok();
+            }
+            else return null;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TenmoServer.DAO
 {
-    public interface ITransferDAO
+    public interface IAccountDAO
     {
     }
 }
