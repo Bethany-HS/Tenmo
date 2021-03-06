@@ -65,7 +65,6 @@ namespace TenmoServer.DAO
                     {
                         return false;
                     }
-
                     conn.Open();
                     SqlCommand cmd2 = new SqlCommand("update accounts set balance = @balance " +
                         "where account_id = @accountId", conn);

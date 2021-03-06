@@ -41,6 +41,7 @@ namespace TenmoServer.Controllers
             else
             {
                 Transfer result = TransferDAO.CreateTransfer(incomingTransfer);
+                return Created($"/transfers/{result.Transfer_id}", result);
             }
 
             return null;

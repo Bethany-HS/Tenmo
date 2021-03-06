@@ -65,7 +65,8 @@ namespace TenmoClient
         }
 
         private static void MenuSelection()
-        {
+        { 
+            bool showBalance = false;
             bool inMenu = true;
             int menuSelection = -1;
             while (inMenu)
@@ -80,6 +81,11 @@ namespace TenmoClient
                 Console.WriteLine("6: Log in as different user");
                 Console.WriteLine("0: Exit");
                 Console.WriteLine("---------");
+                if (showBalance == true)
+                {
+                    decimal balance = accountService.GetBalance(UserService.GetUserId());
+                    Console.WriteLine($"Your account balance is: {balance:C2}");
+                }
                 Console.Write("Please choose an option: ");
 
                 if (!int.TryParse(Console.ReadLine(), out menuSelection))
@@ -89,10 +95,8 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 1)
                 {
-                    decimal balance = accountService.GetBalance(UserService.GetUserId());
+                    showBalance = true;
                     Console.Clear();
-                    Console.WriteLine($"Your account balance is: {balance:C2}");
-
                 }
                 else if (menuSelection == 2)
                 {
@@ -133,7 +137,7 @@ namespace TenmoClient
             if (transfers == null || transfers.Count == 0)
             {
                 Console.WriteLine("Sorry we couldn't find any transfers");
-                Console.WriteLine("Press any key to return");
+                Console.WriteLine("Press enter to return");
                 Console.ReadLine();
                 return;
             }
@@ -192,7 +196,7 @@ namespace TenmoClient
                         Console.WriteLine($"Status: {returnTransfer.TransferStatus}");
                         Console.WriteLine($"Amount: {returnTransfer.Amount:C2}");
                         Console.WriteLine("-------------------------------------------");
-                        Console.WriteLine("Please press any button to return");
+                        Console.WriteLine("Please press enter to return");
                         Console.ReadLine();
                         Console.Clear();
                         validTransfer = true;
@@ -281,6 +285,7 @@ namespace TenmoClient
                             if (transferService.SendMoney(transfer))
                             {
                                 Console.WriteLine("Successfully sent, thank you for using TEnmo!");
+                                Console.WriteLine("Please press enter to return");
                                 Console.ReadLine();
                                 moneySent = true;
                                 Console.Clear();
@@ -288,7 +293,7 @@ namespace TenmoClient
                             }
                             else
                             {
-                                Console.WriteLine("Something went wrong, please press a button to try again");
+                                Console.WriteLine("Something went wrong, please press enter to try again");
                                 Console.ReadLine();
                             }
                         }
@@ -298,7 +303,7 @@ namespace TenmoClient
                 catch (Exception)
                 {
 
-                    Console.WriteLine("Sorry, that's not a valid entry, please press a button to try again");
+                    Console.WriteLine("Sorry, that's not a valid entry, please press enter to try again");
                     Console.ReadLine();
                 }
 
@@ -369,6 +374,7 @@ namespace TenmoClient
                         if (transferService.SendMoney(transfer))
                         {
                             Console.WriteLine("Successfully requested, the user will need to accept before you can access the funds.");
+                            Console.WriteLine("Please press enter to return");
                             Console.ReadLine();
                             requestSent = true;
                             Console.Clear();
@@ -376,14 +382,14 @@ namespace TenmoClient
                         }
                         else
                         {
-                            Console.WriteLine("Something went wrong, please press a button to try again");
+                            Console.WriteLine("Something went wrong, please press enter to try again");
                             Console.ReadLine();
                         }
                     }
                 }
                 catch
                 {
-                    Console.WriteLine("Sorry, that's not a valid entry, please press a button to try again");
+                    Console.WriteLine("Sorry, that's not a valid entry, please press enter to try again");
                     Console.ReadLine();
                 }
             } while (!requestSent);
@@ -399,7 +405,7 @@ namespace TenmoClient
                 if (transfers == null || transfers.Count == 0)
                 {
                     Console.WriteLine("Sorry we couldn't find any transfers");
-                    Console.WriteLine("Press any key to return");
+                    Console.WriteLine("Press enter to return");
                     Console.ReadLine();
                     return;
                 }
