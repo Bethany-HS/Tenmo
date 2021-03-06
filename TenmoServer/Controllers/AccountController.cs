@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace TenmoServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class AccountController : ControllerBase
     {
         private AccountDAO accountDAO;
@@ -31,7 +34,7 @@ namespace TenmoServer.Controllers
         }
 
         [HttpGet("/users")]
-        public ActionResult<List<User>> Test()
+        public ActionResult<List<User>> GetOtherUsers()
         {
             return Ok(userDAO.GetUsers());
         }
@@ -40,12 +43,6 @@ namespace TenmoServer.Controllers
         {
             List<ReturnTransfer> transfers = transferDAO.GetTransfers(id);
             return transfers;
-        }
-        [HttpPost("transfers")]
-        public ActionResult<Transfer> SendMoney(Transfer incomingTransfer)
-        {
-            Transfer result = transferDAO.SendMoney(incomingTransfer);
-            return Created($"/transfers/{result.Transfer_id}", result);
         }
     }
 }

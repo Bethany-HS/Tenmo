@@ -19,4 +19,10 @@
         public string Username { get; set; }
         public string Password { get; set; }
     }
+
+    public class OtherUser
+    {
+        public string Username { get; set; }
+        public int User_Id { get; set; }
+    }
 }

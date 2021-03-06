@@ -9,6 +9,7 @@ namespace TenmoClient
         private static readonly ConsoleService consoleService = new ConsoleService();
         private static readonly AuthService authService = new AuthService();
         private static readonly AccountService accountService = new AccountService();
+        private static readonly TransferService transferService = new TransferService();
         static void Main(string[] args)
         {
             Run();
@@ -59,7 +60,7 @@ namespace TenmoClient
                     Console.WriteLine("Invalid selection.");
                 }
             }
-
+            Console.Clear();
             MenuSelection();
         }
 
@@ -87,11 +88,13 @@ namespace TenmoClient
                 else if (menuSelection == 1)
                 {
                     decimal balance = accountService.GetBalance(UserService.GetUserId());
+                    Console.Clear();
                     Console.WriteLine($"Your account balance is: {balance:C2}");
 
                 }
                 else if (menuSelection == 2)
                 {
+                    ViewTransfers();
 
                 }
                 else if (menuSelection == 3)
@@ -100,7 +103,7 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 4)
                 {
-
+                    SendMoney();
                 }
                 else if (menuSelection == 5)
                 {
@@ -118,6 +121,179 @@ namespace TenmoClient
                     Environment.Exit(0);
                 }
             }
+        }
+
+        private static void ViewTransfers()
+        {
+            Console.Clear();
+            List<ReturnTransfer> transfers = transferService.GetTransfers(UserService.GetUserId());
+            if (transfers == null || transfers.Count == 0)
+            {
+                Console.WriteLine("Sorry we couldn't find any transfers");
+                Console.WriteLine("Press any key to return");
+                Console.ReadLine();
+                return;
+            }
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("Transfers");
+            Console.Write("ID");
+            Console.Write("From/To".PadLeft(17));
+            Console.WriteLine("Amount".PadLeft(17));
+            Console.WriteLine("-------------------------------------------");
+            
+            foreach(ReturnTransfer transfer in transfers)
+            {
+                Console.Write($"{transfer.Transfer_id}".PadRight(10));
+                if(transfer.FromName == UserService.GetUserName())
+                {
+                    Console.Write("To: ".PadRight(6));
+                    Console.Write($"{transfer.ToName}");
+                    Console.WriteLine($"{transfer.Amount:C2}".PadLeft(15));
+                }
+                else
+                {
+                    Console.Write("From: ");
+                    Console.Write($"{transfer.FromName}");
+                    Console.WriteLine($"{transfer.Amount:C2}".PadLeft(15));
+                }
+
+            }
+            Console.WriteLine("---------");
+            bool validTransfer = false;
+            do
+            {
+                Console.Write("Please enter the transfer ID to view details (0 to cancel): ");
+                string userInput = Console.ReadLine().Trim();
+
+                if (userInput == "0")
+                {
+                    return;
+                }
+                try
+                {
+                    ReturnTransfer returnTransfer = transferService.GetTransfer(Convert.ToInt32(userInput));
+                    if (returnTransfer.Transfer_id != 0)
+                    {
+                        Console.WriteLine("-------------------------------------------");
+                        Console.WriteLine("Transfer Details");
+                        Console.WriteLine("-------------------------------------------");
+                        Console.WriteLine($"Id: {returnTransfer.Transfer_id}");
+                        Console.WriteLine($"From: {returnTransfer.FromName}");
+                        Console.WriteLine($"To: {returnTransfer.ToName}");
+                        Console.WriteLine($"Type: {returnTransfer.TransferType}");
+                        Console.WriteLine($"Status: {returnTransfer.TransferStatus}");
+                        Console.WriteLine($"Amount: {returnTransfer.Amount:C2}");
+                        Console.WriteLine("-------------------------------------------");
+                        Console.WriteLine("Please press any button to return");
+                        Console.ReadLine();
+                        Console.Clear();
+                        validTransfer = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please select a valid transfer.");
+                    }
+
+                }
+                catch
+                {
+                    Console.WriteLine("Please select a valid transfer");
+                }
+            } while (!validTransfer);
+
+        }
+
+        private static void SendMoney()
+        {
+            bool selectedUser = false;
+            string sendToUser = "";
+            do
+            {
+                List<OtherUser> otherUsers = accountService.RetrieveUsers();
+                Console.Clear();
+                Console.WriteLine("-------------------------------------------");
+                Console.WriteLine("Users");
+                Console.Write("ID");
+                Console.WriteLine("Name".PadLeft(15));
+                Console.WriteLine("-------------------------------------------");
+                foreach (OtherUser user in otherUsers)
+                {
+                    if (user.User_Id != UserService.GetUserId())
+                    {
+                        Console.Write($"{user.User_Id}");
+                        Console.WriteLine($"{user.Username}".PadLeft(15));
+                    }
+                }
+                Console.WriteLine("---------\n");
+                Console.Write("Enter ID of the user you are sending to (0 to cancel): ");
+                sendToUser = Console.ReadLine().Trim();
+                if(Convert.ToInt32(sendToUser) == 0)
+                {
+                    return;
+                }
+                try
+                {
+                    if (accountService.GetBalance(Convert.ToInt32(sendToUser)) == -1)
+                    {
+                        Console.WriteLine("Please enter a valid user");
+                    }
+                    else
+                    {
+                        selectedUser = true;
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Please select a valid user ID");
+                }
+
+            } while (!selectedUser);
+            bool moneySent = false;
+            do
+            {
+                Console.Write("Enter the amount to send: ");
+                string moneyToSend = Console.ReadLine().Trim();
+                try
+                {
+                    decimal convertedMoneyToSend = Convert.ToDecimal(moneyToSend);
+                    if(convertedMoneyToSend < 0 || convertedMoneyToSend == 0)
+                    {
+                        Console.WriteLine("Please enter a postive number");
+                    }
+                    else
+                    {
+                        if (convertedMoneyToSend > accountService.GetBalance(UserService.GetUserId()))
+                        {
+                            Console.WriteLine("Sorry, you don't have enough funds.");
+                        }
+                        else
+                        {
+                            Transfer transfer = new Transfer(2, 2, UserService.GetUserId(), Convert.ToInt32(sendToUser), convertedMoneyToSend);
+                            if (transferService.SendMoney(transfer))
+                            {
+                                Console.WriteLine("Successfully sent, thank you for using TEnmo!");
+                                Console.ReadLine();
+                                moneySent = true;
+                                Console.Clear();
+                                return;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Something went wrong, please press a button to try again");
+                                Console.ReadLine();
+                            }
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine("Sorry, that's not a valid entry, please press a button to try again");
+                    Console.ReadLine();
+                }
+
+            } while (!moneySent);
         }
     }
 }
